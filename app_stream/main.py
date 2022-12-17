@@ -24,6 +24,8 @@ def load_data():
 @st.cache
 def load_data2():
     data2 = pd.read_excel(DATA2)
+    data2.drop(columns=["previous_ended_rental_id","time_delta_with_previous_rental_in_minutes"], inplace=True)
+    data2.dropna()
     return data2
 
 data_load_state = st.text('Loading data...')
@@ -72,7 +74,7 @@ col4, col5 = st.columns(2)
 
 with col4:
     st.markdown("")
-    checkin_type = data2["checkin_type"].value_counts()
+    checkin_type = data2.groupby("checkin_type")["delay_at_checkout_in_minutes"].mean()
     
     fig = px.bar(checkin_type, title="Mode de location")
     fig.update_layout(bargap=0.2)
@@ -84,4 +86,4 @@ with col5:
     
     fig = px.bar(fuel, title="Energie la plus louer")
     fig.update_layout(bargap=0.2)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, use_container_width=True) 
