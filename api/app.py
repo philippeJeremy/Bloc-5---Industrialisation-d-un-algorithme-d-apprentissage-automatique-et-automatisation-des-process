@@ -19,12 +19,6 @@ tags_metadata = [
         "name": "Introduction Endpoints",
         "description": "Simple endpoints to try out!",
     },
-
-    {
-        "name": "Blog Endpoints",
-        "description": "More complex endpoints that deals with actual data with **GET** and **POST** requests."
-    },
-
     {
         "name": "Machine Learning",
         "description": "Prediction Endpoint."
@@ -32,103 +26,62 @@ tags_metadata = [
 ]
 
 app = FastAPI(
-    title="🪐 Jedha Demo API",
+    title="GetAround",
     description=description,
     version="0.1",
     contact={
-        "name": "Jedha",
-        "url": "https://jedha.co",
+        "name": "GetAround",
+        "url": "https://GetAround.com",
     },
     openapi_tags=tags_metadata
 )
 
-class BlogArticles(BaseModel):
-    title: str
-    content: str
-    author: str = "Anonymous Author"
+class DescriptionVehicule(BaseModel):
+    marque: str
+    kilometrage: int
+    puissance: int
+    energie: str
+    car_type: str
+    parking_private: bool 
+    gps: bool 
+    air_conditionning: bool 
+    automatic: bool 
+    getaround_connect: bool 
+    speed_regulator: bool 
+    winter_tires: bool 
 
-class PredictionFeatures(BaseModel):
-    YearsExperience: float
 
 @app.get("/", tags=["Introduction Endpoints"])
 async def index():
     """
-    Simply returns a welcome message!
+    Renvoie simplement un message de bienvenue !
     """
-    message = "Hello world! This `/` is the most simple and default endpoint. If you want to learn more, check out documentation of the api at `/docs`"
+    message = "Bonjour! Ce `/` est le point de terminaison le plus simple et par défaut. Si vous voulez en savoir plus, consultez la documentation de l'API sur `/docs`"
     return message
 
-@app.get("/greetings", tags=["Introduction Endpoints"])
-async def greetings(name: str="Mr (or Miss) Nobody"):
-    """
-    Say hi to anybody who's specifying their name as query parameter. 
-    """
-    greetings = {
-        "Message": f"Hello {name} How are you today?"
-    }
-    return greetings
-
-
-@app.get("/blog-articles/{blog_id}", tags=["Blog Endpoints"])
-async def read_blog_article(blog_id: int):
-    """
-    Say hi to anybody who's specifying their name as query parameter. 
-
-    >👋 Careful, if you change the file using `/create-blog-article` right before, the new dataframe is not right away available, you will access a previous version. 
-    """
-
-    articles = pd.read_csv("https://full-stack-assets.s3.eu-west-3.amazonaws.com/Deployment/articles.csv")
-    if blog_id > len(articles):
-        response = {
-            "msg": "We don't have that many articles!"
-        }
-    else:
-        article = pd.read_csv("https://full-stack-assets.s3.eu-west-3.amazonaws.com/Deployment/articles.csv").iloc[blog_id, :]
-        response = {
-            "title": article.title,
-            "content": article.content, 
-            "author": article.author
-        }
-
-    return response
-
-
-@app.post("/create-blog-article", tags=["Blog Endpoints"])
-async def create_blog_article(blog_article: BlogArticles):
-    """
-    Append a new blog article into the database which is a `.csv` file. 
-    """
-    df = pd.read_csv("https://full-stack-assets.s3.eu-west-3.amazonaws.com/Deployment/articles.csv")
-    new_article = pd.Series({
-        'id': len(df)+1,
-        'title': blog_article.title,
-        'content': blog_article.content,
-        'author': blog_article.author
-    })
-
-    df = df.append(new_article, ignore_index=True)
-    df.to_csv('s3://full-stack-assets/Deployment/articles.csv')
-
-    return df.to_json()
-
-@app.post("/post-picture", tags=["Blog Endpoints"])
-async def post_picture(file: UploadFile= File(...)):
-    """
-    Upload a picture and read its file name.
-    """
-    return {"picture": file.filename}
-
-
 @app.post("/predict", tags=["Machine Learning"])
-async def predict(predictionFeatures: PredictionFeatures):
+async def predict(price_day: DescriptionVehicule):
     """
     Prediction of salary for a given year of experience! 
     """
     # Read data 
-    years_experience = pd.DataFrame({"YearsExperience": [predictionFeatures.YearsExperience]})
+    price_day = pd.DataFrame({
+                            "model_key": [price_day.marque],
+                            "mileage": [price_day.kilometrage],
+                            "engine_power": [price_day.puissance],
+                            "fuel": [price_day.energie],
+                            "car_type": [price_day.car_type],
+                            "private_parking_available": [price_day.parking_private],
+                            "has_gps": [price_day.gps],
+                            "has_air_conditioning": [price_day.air_conditionning],
+                            "automatic_car": [price_day.automatic],
+                            "has_getaround_connect": [price_day.getaround_connect],
+                            "has_speed_regulator": [price_day.speed_regulator],
+                            "winter_tires": [price_day.winter_tires]
+    })
 
     # Log model from mlflow 
-    logged_model = 'runs:/3392c66a0fc1486bba1eea4c73d6ab05/salary_estimator'
+    logged_model = 'runs:/eb5e512da4414cc280c92b50330d6328/my-first-mlflow-experiment'
 
     # Load model as a PyFuncModel.
     loaded_model = mlflow.pyfunc.load_model(logged_model)
@@ -136,7 +89,7 @@ async def predict(predictionFeatures: PredictionFeatures):
     # If you want to load model persisted locally
     #loaded_model = joblib.load('salary_predictor/model.joblib')
 
-    prediction = loaded_model.predict(years_experience)
+    prediction = loaded_model.predict(price_day)
 
     # Format response
     response = {"prediction": prediction.tolist()[0]}

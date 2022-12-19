@@ -5,6 +5,17 @@ payload = {
    "Author": "Jaskier"
 }
 r = requests.post("http://localhost:4000/predict", json={
-  "YearsExperience": 0
+    "marque": "Citroën",
+    "kilometrage": 27920,
+    "puissance": 110,
+    "energie": "diesel",
+    "car_type": "convertible",
+    "parking_private": False, 
+    "gps": True,
+    "air_conditionning": True, 
+    "automatic": False,
+    "getaround_connect": False, 
+    "speed_regulator": True, 
+    "winter_tires": False 
 })
 print(r.content)
