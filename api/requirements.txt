@@ -11,3 +11,4 @@ sklearn
 python-multipart
 fsspec
 s3fs
+psutil

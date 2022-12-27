@@ -10,4 +10,4 @@ COPY . /home/app
 
 CMD streamlit run --server.port $PORT main.py
 
-# docker run -it -v "$(pwd):/home/app" -e PORT=80 -p 4000:80 bloc_5 
+ 

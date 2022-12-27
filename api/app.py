@@ -6,6 +6,8 @@ from typing import Literal, List, Union
 from fastapi import FastAPI, File, UploadFile
 import joblib
 
+mlflow.set_tracking_uri("https://getaround-model.herokuapp.com/")
+
 description = """
 Welcome to  API.  Try it out 🕹️
 
@@ -36,19 +38,20 @@ app = FastAPI(
     openapi_tags=tags_metadata
 )
 
-class DescriptionVehicule(BaseModel):
-    marque: str
-    kilometrage: int
-    puissance: int
-    energie: str
-    car_type: str
-    parking_private: bool 
-    gps: bool 
-    air_conditionning: bool 
-    automatic: bool 
-    getaround_connect: bool 
-    speed_regulator: bool 
-    winter_tires: bool 
+class PredictionFeatures(BaseModel):
+    model_key: str = "Citroën"
+    mileage: int = 140411
+    engine_power: int = 100
+    fuel: str = "diesel"
+    paint_color: str = "black"
+    car_type: str = "convertible"
+    private_parking_available: bool = True
+    has_gps: bool = True
+    has_air_conditioning: bool = False
+    automatic_car: bool = False
+    has_getaround_connect: bool = True
+    has_speed_regulator: bool = True
+    winter_tires: bool = True
 
 
 @app.get("/", tags=["Introduction Endpoints"])
@@ -60,38 +63,26 @@ async def index():
     return message
 
 @app.post("/predict", tags=["Machine Learning"])
-async def predict(price_day: DescriptionVehicule):
+async def predict(predictionFeatures: PredictionFeatures):
     """
-    Prediction of salary for a given year of experience! 
+    Prediction du prix à la journée. 
     """
-    # Read data 
-    price_day = pd.DataFrame({
-                            "model_key": [price_day.marque],
-                            "mileage": [price_day.kilometrage],
-                            "engine_power": [price_day.puissance],
-                            "fuel": [price_day.energie],
-                            "car_type": [price_day.car_type],
-                            "private_parking_available": [price_day.parking_private],
-                            "has_gps": [price_day.gps],
-                            "has_air_conditioning": [price_day.air_conditionning],
-                            "automatic_car": [price_day.automatic],
-                            "has_getaround_connect": [price_day.getaround_connect],
-                            "has_speed_regulator": [price_day.speed_regulator],
-                            "winter_tires": [price_day.winter_tires]
-    })
+   
+    price_day = pd.DataFrame(dict(predictionFeatures), index=[0])
+                            
 
-    # Log model from mlflow 
-    logged_model = 'runs:/eb5e512da4414cc280c92b50330d6328/my-first-mlflow-experiment'
+    
+    logged_model = 'runs:/1a51baa33dda46a58f334fd81ecb8113/price_car'
 
-    # Load model as a PyFuncModel.
+    
     loaded_model = mlflow.pyfunc.load_model(logged_model)
 
-    # If you want to load model persisted locally
-    #loaded_model = joblib.load('salary_predictor/model.joblib')
+    
+    # loaded_model = joblib.load('model.joblib')
 
     prediction = loaded_model.predict(price_day)
 
-    # Format response
+    
     response = {"prediction": prediction.tolist()[0]}
     return response
 
