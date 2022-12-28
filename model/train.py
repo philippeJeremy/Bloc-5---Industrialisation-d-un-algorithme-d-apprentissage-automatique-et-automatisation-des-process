@@ -11,11 +11,7 @@ from mlflow.models.signature import infer_signature
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.linear_model import LinearRegression
-from sklearn.tree import DecisionTreeRegressor
-from sklearn.ensemble import BaggingRegressor, AdaBoostRegressor, GradientBoostingRegressor, VotingRegressor, StackingRegressor
 from sklearn.preprocessing import StandardScaler, OneHotEncoder 
-
-
 
 if __name__ == "__main__":
 
@@ -51,8 +47,6 @@ if __name__ == "__main__":
 
     numeric_features, categorical_features = categorie(x)
 
-    
-
     numeric_transformer = Pipeline(steps=[
             ('scaler', StandardScaler())
             ])
@@ -72,7 +66,6 @@ if __name__ == "__main__":
 
     with mlflow.start_run(experiment_id = experiment.experiment_id):
 
-        
         model.fit(x_train, y_train)
 
         predictions = model.predict(x_train)
@@ -83,10 +76,6 @@ if __name__ == "__main__":
             registered_model_name="price_car_model",
             signature=infer_signature(x_train, predictions)
         )
-
-        
-        
-    
 
     # joblib.dump(model, "model.joblib")
 

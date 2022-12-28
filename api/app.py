@@ -13,9 +13,7 @@ Welcome to  API.  Try it out 🕹️
 
 ## Introduction Endpoints
 
-
 """
-
 tags_metadata = [
     {
         "name": "Introduction Endpoints",
@@ -23,7 +21,7 @@ tags_metadata = [
     },
     {
         "name": "Machine Learning",
-        "description": "Prediction Endpoint."
+        "description": "Prediction price."
     }
 ]
 
@@ -33,11 +31,10 @@ app = FastAPI(
     version="0.1",
     contact={
         "name": "GetAround",
-        "url": "https://GetAround.com",
+        "url": "https://getaround-model.herokuapp.com/",
     },
     openapi_tags=tags_metadata
 )
-
 class PredictionFeatures(BaseModel):
     model_key: str = "Citroën"
     mileage: int = 140411
@@ -52,7 +49,6 @@ class PredictionFeatures(BaseModel):
     has_getaround_connect: bool = True
     has_speed_regulator: bool = True
     winter_tires: bool = True
-
 
 @app.get("/", tags=["Introduction Endpoints"])
 async def index():
@@ -70,22 +66,16 @@ async def predict(predictionFeatures: PredictionFeatures):
    
     price_day = pd.DataFrame(dict(predictionFeatures), index=[0])
                             
-
-    
     logged_model = 'runs:/1a51baa33dda46a58f334fd81ecb8113/price_car'
 
-    
     loaded_model = mlflow.pyfunc.load_model(logged_model)
 
-    
     # loaded_model = joblib.load('model.joblib')
 
     prediction = loaded_model.predict(price_day)
 
-    
-    response = {"prediction": prediction.tolist()[0]}
+    response = prediction.tolist()[0]
     return response
-
 
 if __name__=="__main__":
     uvicorn.run(app, host="0.0.0.0", port=4000)
