@@ -1,13 +1,13 @@
-FROM python:3.10
+FROM continuumio/miniconda3
 
 WORKDIR /home/app
 
+RUN apt-get update
+RUN apt-get install nano unzip
 RUN apt install curl -y
 
-RUN curl -fsSL https://get.deta.dev/cli.sh | sh
-RUN pip install pandas numpy streamlit matplotlib plotly openpyxl
+
+RUN pip install pandas streamlit sklearn plotly numpy openpyxl
 COPY . /home/app
 
-CMD streamlit run --server.port $PORT main.py
-
- 
+CMD streamlit run --server.port $PORT _👋_acceuil.py
