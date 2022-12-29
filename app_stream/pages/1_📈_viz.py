@@ -42,6 +42,11 @@ retard_mobil = data_mobile["delay_at_checkout_in_minutes"].mean()
 data_connect = data_retard[data_retard["checkin_type"] == "connect"]
 retard_connect = data_connect["delay_at_checkout_in_minutes"].mean()
 
+# histogramme
+histo_checkout = data[(data["delay_at_checkout_in_minutes"] > -1440) & (data["delay_at_checkout_in_minutes"] < 1440)]
+histo_delta = data[(data["time_delta_with_previous_rental_in_minutes"] > -1440) & (data["time_delta_with_previous_rental_in_minutes"] < 1440)]
+
+
 
 
 
@@ -67,7 +72,7 @@ pie.add_trace(go.Pie(
     row=1, col=2)
 
 pie.update_layout(
-    width=1500,
+    width=1200,
     legend=dict(
         font=dict(
             size=16
@@ -93,7 +98,7 @@ fig_pie.add_trace(go.Pie(
     row=1, col=2)
 
 fig_pie.update_layout(
-    width=1500,
+    width=1200,
     legend=dict(
         font=dict(
             size=16
@@ -108,64 +113,33 @@ st.write(f'Le retard moyen pour la version mobil est de {round(retard_mobil)} mi
 st.write(f'Le retard moyen pour la version connect est de {round(retard_connect)} minutes')
 
 
-fig_connect = make_subplots(rows= 2, cols= 1,shared_xaxes = True, vertical_spacing = 0.01,)
-fig_connect.add_trace(
-    go.Histogram(
-        name='connect',
-        x = data_connect["time_delta_with_previous_rental_in_minutes"],
-        marker=dict(
-        color='blue'
-        )),
-        row = 1,
-        col = 1)
+fig = px.histogram(histo_delta, x="time_delta_with_previous_rental_in_minutes",
+                      title = 'histogramme sur 24 heures',
+                      color = 'checkin_type',
+                      barmode ='group',
+                      width= 1200,
+                      height = 600
+                      ) 
+fig.update_layout(title_x = 0.5,
+                    legend=dict(
+                        font=dict(
+                    size=16
+                    ))) 
+                            
+st.plotly_chart(fig)
 
-fig_connect.add_trace(
-    go.Histogram(
-        name='mobil',
-        x = data_mobile["time_delta_with_previous_rental_in_minutes"],
-              marker=dict(
-        color='pink'
-        )),
-        row = 2,
-        col = 1)
-   
+fig = px.histogram(histo_checkout, x="delay_at_checkout_in_minutes",
+                      title = 'histogramme sur 24 heures',
+                      color = 'checkin_type',
+                      barmode ='group',
+                      width= 1200,
+                      height = 600
+                      ) 
+fig.update_layout(title_x = 0.5,
+                legend=dict(
+                    font=dict(
+                size=16
+                ))) 
+      
+st.plotly_chart(fig)
 
-fig_connect.update_layout( 
-                    width=1000, 
-                    height=500, 
-                    title= {'x' : 0.5},
-                    title_text="time_delta_with_previous_rental_in_minutes",
-                    )
-
-st.plotly_chart(fig_connect)
-
-fig_mobile = make_subplots(rows= 2, cols= 1,shared_xaxes = True, vertical_spacing = 0.01,)
-fig_mobile.add_trace(
-    go.Histogram(
-        name='connect',
-        x = data_connect["delay_at_checkout_in_minutes"],
-        marker=dict(
-        color='blue'
-        )),
-        row = 1,
-        col = 1)
-
-fig_mobile.add_trace(
-    go.Histogram(
-        name='mobil',
-        x = data_mobile["delay_at_checkout_in_minutes"],
-              marker=dict(
-        color='pink'
-        )),
-        row = 2,
-        col = 1)
-   
-
-fig_mobile.update_layout( 
-                    width=1000, 
-                    height=500, 
-                    title= {'x' : 0.5},
-                    title_text="delay_at_checkout_in_minutes",
-                    )
-
-st.plotly_chart(fig_mobile)
