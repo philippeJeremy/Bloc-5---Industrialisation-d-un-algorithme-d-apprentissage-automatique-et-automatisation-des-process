@@ -6,8 +6,6 @@ import plotly.graph_objects as go
 
 from plotly.subplots import make_subplots
 
-
-
 DATA = "get_around_delay_analysis.xlsx"
 
 @st.cache
@@ -15,25 +13,23 @@ def load_data():
     data = pd.read_excel(DATA)
     return data
 
-
-
 data_load_state = st.text('Loading data...')
 data = load_data()
 data_load_state.text("")
 
-# ratio en % des type de location
+# Ratio in % of rental type
 ratio_checking_type = data["checkin_type"].value_counts(normalize=True).round(3)
 
 ratio_state = data["state"].value_counts(normalize=True).round(3)
 
-# ratio d'annulation selon type de location
+# Cancellation ratio according to rental type
 mobile = data[data["checkin_type"] == "mobile"]
 mobile_ratio_state = mobile["state"].value_counts(normalize=True).round(3)
 
 connect = data[data["checkin_type"] == "connect"]
 connect_ratio_state = connect["state"].value_counts(normalize=True).round(3)
 
-# new dataFrame incluant que les retards
+# New dataFrame including only delays
 data_retard = data[~data["delay_at_checkout_in_minutes"].isnull()]
 
 data_mobile = data_retard[data_retard["checkin_type"] == "mobile"]
@@ -42,11 +38,11 @@ retour_mobil = data_mobile["delay_at_checkout_in_minutes"].mean()
 data_connect = data_retard[data_retard["checkin_type"] == "connect"]
 retour_connect = data_connect["delay_at_checkout_in_minutes"].mean()
 
-# histogramme sur 24h
+# 24 hour histogram
 histo_checkout = data[(data["delay_at_checkout_in_minutes"] > -1440) & (data["delay_at_checkout_in_minutes"] < 1440)]
 histo_delta = data[(data["time_delta_with_previous_rental_in_minutes"] > -1440) & (data["time_delta_with_previous_rental_in_minutes"] < 1440)]
 
-# reel retard ne prend pas en compte les valeur negatif vue qu'il sont rendue en avance
+# Real delay does not take into account negative values ​​since they are returned in advance.
 histo_checkout_reel = data[(data["delay_at_checkout_in_minutes"] > 0) & (data["delay_at_checkout_in_minutes"] < 1440)]
 
 retard_mobil = histo_checkout_reel[histo_checkout_reel["checkin_type"] == "mobile"]
@@ -55,10 +51,10 @@ retard_mobil = retard_mobil["delay_at_checkout_in_minutes"].mean()
 retard_connect = histo_checkout_reel[histo_checkout_reel["checkin_type"] == "connect"]
 retard_connect = retard_connect["delay_at_checkout_in_minutes"].mean()
 
-# ratio en % des types d annulation
+# Ratio in % of cancellation types
 ratio_checking_type_retard = histo_checkout_reel["checkin_type"].value_counts(normalize=True).round(3)
 
-# evaluation des perte si application delay
+# Assessment of losses if application of deadlines
 perte_global = data[~data["time_delta_with_previous_rental_in_minutes"].isnull()]
 perte_global = perte_global[~perte_global["delay_at_checkout_in_minutes"].isnull()]
 perte_global["eval"] = perte_global['time_delta_with_previous_rental_in_minutes'].apply(lambda x: 'perdu' if x <= 129 else 'pas perdu')
@@ -80,7 +76,7 @@ st.markdown("""<h1 style='text-align: center; color: white; -webkit-box-shadow: 
             5px 5px 15px 5px rgba(0,0,0,0), 5px 5px 15px 5px rgba(0,0,0,0);background: #9400D3;}'>Dashbord GetAround</h1>""", unsafe_allow_html=True)
 st.markdown("###")
 
-st.markdown("<h3 style='text-align: center; color: white;'>proportion des type de location et % </h3>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: center; color: white;'>Proportion of rentals in %</h3>", unsafe_allow_html=True)
 
 pie_1 = go.Figure()
 pie_1.add_trace(go.Pie(values=ratio_checking_type,
@@ -98,7 +94,7 @@ st.plotly_chart(pie_1)
 
 st.markdown("---")
 
-st.markdown("<h3 style='text-align: center; color: white;'>proportion des annulation de location</h3>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: center; color: white;'>Proportion of rental cancellations</h3>", unsafe_allow_html=True)
 
 pie_2 = go.Figure()
 pie_2.add_trace(go.Pie(values=ratio_state,
@@ -116,7 +112,7 @@ st.plotly_chart(pie_2)
 
 st.markdown("---")
 
-st.markdown("<h3 style='text-align: center; color: white;'>proportion des annulation par type de location</h3>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: center; color: white;'>Proportion of cancellations by type of rental</h3>", unsafe_allow_html=True)
 pie_3 = make_subplots(rows=1, cols=2, specs=[[{"type": "pie"},{"type": "pie"}]],shared_yaxes = True,
                        subplot_titles=["Global", "Mobile", "Connect"])
 
@@ -142,13 +138,13 @@ st.plotly_chart(pie_3)
 
 st.markdown("---")
 
-st.write(f"Le delay moyen d'un retour pour la version mobil est de {round(retour_mobil)} minutes par rapport a l'heure indiquer de retour")
+st.write(f"The average return time for the mobile version is {round(retour_mobil)} minutes from the indicated return time.")
 
-st.write(f"Le delay moyen d'un retour pour la version connect est de {round(retour_connect)} minutes par rapport a l'heure indiquer de retour")
+st.write(f"The average return time for the connect version is {round(retour_connect)} minutes from the time indicated for return.")
 
 st.markdown("---")
 
-st.markdown("<h3 style='text-align: center; color: white;'>histogramme sur 24 heures du temps entre les reservations</h3>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: center; color: white;'>24-hour histogram of time between bookings</h3>", unsafe_allow_html=True)
 fig = px.histogram(histo_delta, x="time_delta_with_previous_rental_in_minutes",                   
                     color = 'checkin_type',
                     barmode ='group',
@@ -165,7 +161,7 @@ st.plotly_chart(fig)
 
 st.markdown("---")
 
-st.markdown("<h3 style='text-align: center; color: white;'>histogramme sur 24 heures des delais de retour</h3>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: center; color: white;'>24-hour histogram of return times</h3>", unsafe_allow_html=True)
 fig = px.histogram(histo_checkout, x="delay_at_checkout_in_minutes",
                     color = 'checkin_type',
                     barmode ='group',
@@ -182,14 +178,14 @@ st.plotly_chart(fig)
 
 st.markdown("---")
 
-st.write("Pour se faire une veritable idée sur les retard il faut enlever les retour en avance pur voir le réel impact des retard")
+st.write("To get a real idea of ​​​​the delays, you have to remove the returns in advance to see the real impact of the delays.")
 
-st.write(f"Le delay moyen d'un retard pour la version mobil est de {round(retard_mobil)} minutes par rapport a l'heure indiquer de retour")
+st.write(f"The average time of a delay for the mobile version is {round(retard_mobil)} minutes compared to the time indicated back")
 
-st.write(f"Le delay moyen d'un retard pour la version connect est de {round(retard_connect)} minutes par rapport a l'heure indiquer de retour")
+st.write(f"The average time of a delay for the connect version is {round(retard_connect)} minutes from the time indicated back")
 
 
-st.markdown("<h3 style='text-align: center; color: white;'>histogramme sur 24 heures des retards</h3>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: center; color: white;'>24-hour histogram of delays</h3>", unsafe_allow_html=True)
 fig = px.histogram(histo_checkout_reel, x="delay_at_checkout_in_minutes",
                     color = 'checkin_type',
                     barmode ='group',
@@ -206,7 +202,7 @@ st.plotly_chart(fig)
 
 st.markdown("---")
 
-st.markdown("<h3 style='text-align: center; color: white;'>proportion des annulation par type de location en tenan compte que des retards</h3>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: center; color: white;'>Proportion of cancellations by type of rental taking into account only delays</h3>", unsafe_allow_html=True)
 pie_4 = go.Figure()
 pie_4.add_trace(go.Pie(values=perte_global,
                         labels=['location conserver', 'location perdu'],
@@ -222,7 +218,7 @@ pie_4.update_layout(
 st.plotly_chart(pie_4)
 
 
-st.write("si nous appliquon un delay 44% des revenue serai impacter")
+st.write("If we apply an average delay 44% of revenue will be impacted")
 
 st.markdown("---")
 
@@ -250,8 +246,8 @@ pie_5.update_layout(
 
 st.plotly_chart(pie_5)
 
-st.write("si nous appliquons un delay moyen sur les mobile, ils perderont 44% des revenue")
+st.write("If we apply an average delay on mobile, they will lose 44% of revenue")
 
-st.write("si nous appliquons un delay moyen sur les connect, ils perderont 31% des revenue")
+st.write("If we apply an average delay on the connects, they will lose 31% of the revenue")
 
 st.markdown("---")
