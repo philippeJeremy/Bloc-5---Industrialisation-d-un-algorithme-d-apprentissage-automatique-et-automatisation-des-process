@@ -138,12 +138,6 @@ st.plotly_chart(pie_3)
 
 st.markdown("---")
 
-st.write(f"The average return time for the mobile version is {round(retour_mobil)} minutes from the indicated return time.")
-
-st.write(f"The average return time for the connect version is {round(retour_connect)} minutes from the time indicated for return.")
-
-st.markdown("---")
-
 st.markdown("<h3 style='text-align: center; color: white;'>24-hour histogram of time between bookings</h3>", unsafe_allow_html=True)
 fig = px.histogram(histo_delta, x="time_delta_with_previous_rental_in_minutes",                   
                     color = 'checkin_type',
@@ -177,13 +171,6 @@ fig.update_layout(
 st.plotly_chart(fig)
 
 st.markdown("---")
-
-st.write("To get a real idea of ​​​​the delays, you have to remove the returns in advance to see the real impact of the delays.")
-
-st.write(f"The average time of a delay for the mobile version is {round(retard_mobil)} minutes compared to the time indicated back")
-
-st.write(f"The average time of a delay for the connect version is {round(retard_connect)} minutes from the time indicated back")
-
 
 st.markdown("<h3 style='text-align: center; color: white;'>24-hour histogram of delays</h3>", unsafe_allow_html=True)
 fig = px.histogram(histo_checkout_reel, x="delay_at_checkout_in_minutes",
@@ -245,9 +232,5 @@ pie_5.update_layout(
                 )))
 
 st.plotly_chart(pie_5)
-
-st.write("If we apply an average delay on mobile, they will lose 44% of revenue")
-
-st.write("If we apply an average delay on the connects, they will lose 31% of the revenue")
 
 st.markdown("---")
