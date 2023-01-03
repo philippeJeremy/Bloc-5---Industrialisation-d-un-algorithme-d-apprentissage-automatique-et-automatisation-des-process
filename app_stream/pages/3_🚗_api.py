@@ -4,7 +4,6 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
-
 DATA = "./get_around_pricing_project.csv"
 
 @st.cache
@@ -16,12 +15,10 @@ data_load_state = st.text('Loading data...')
 data = load_data()
 data_load_state.text("")
 
-
 def requette(donnees):
     response = requests.post("https://api-getaround.herokuapp.com/predict", json=donnees)
     return response.json()
-
-        
+       
 with st.form("my_form"):
     model_key = st.selectbox("Model de voitures", data["model_key"].sort_values().unique())
     mileage = st.number_input("Kilometrage",min_value=0, value=0)

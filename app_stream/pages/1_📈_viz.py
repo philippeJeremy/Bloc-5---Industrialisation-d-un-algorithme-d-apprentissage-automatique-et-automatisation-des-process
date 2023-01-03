@@ -59,10 +59,10 @@ retard_connect = retard_connect["delay_at_checkout_in_minutes"].mean()
 ratio_checking_type_retard = histo_checkout_reel["checkin_type"].value_counts(normalize=True).round(3)
 
 # evaluation des perte si application delay
-perte = data[~data["time_delta_with_previous_rental_in_minutes"].isnull()]
-perte = perte[~perte["delay_at_checkout_in_minutes"].isnull()]
-perte["eval"] = perte['time_delta_with_previous_rental_in_minutes'].apply(lambda x: 'perdu' if x <= 129 else 'pas perdu')
-perte_global = perte["eval"].value_counts(normalize=True)
+perte_global = data[~data["time_delta_with_previous_rental_in_minutes"].isnull()]
+perte_global = perte_global[~perte_global["delay_at_checkout_in_minutes"].isnull()]
+perte_global["eval"] = perte_global['time_delta_with_previous_rental_in_minutes'].apply(lambda x: 'perdu' if x <= 129 else 'pas perdu')
+perte_global = perte_global["eval"].value_counts(normalize=True)
 
 perte_mobile = data[~data["time_delta_with_previous_rental_in_minutes"].isnull()]
 perte_mobile = perte_mobile[~perte_mobile["delay_at_checkout_in_minutes"].isnull()]
@@ -74,7 +74,6 @@ perte_connect = perte_connect[~perte_connect["delay_at_checkout_in_minutes"].isn
 perte_connect["eval"] = perte_connect['time_delta_with_previous_rental_in_minutes'].apply(lambda x: 'perdu' if x <= 77 else 'pas perdu')
 perte_connect = perte_connect["eval"].value_counts(normalize=True)
 
-
 st.markdown("""<h1 style='text-align: center; color: white; -webkit-box-shadow: 7px -5px 10px 0px #4B0082, 11px -9px 10px 0px #0000FF, 16px -14px 10px 0px #00FF00, 20px -17px 10px 0px #FFFF00, 
             24px -19px 10px 0px #FF7F00, 27px -23px 10px 0px #FF0000, 5px 5px 15px 5px rgba(0,0,0,0), 5px 5px 15px 5px rgba(0,0,0,0); 
             box-shadow: 7px -5px 10px 0px #4B0082, 11px -9px 10px 0px #0000FF, 16px -14px 10px 0px #00FF00, 20px -17px 10px 0px #FFFF00, 24px -19px 10px 0px #FF7F00, 27px -23px 10px 0px #FF0000, 
@@ -84,17 +83,16 @@ st.markdown("###")
 st.markdown("<h3 style='text-align: center; color: white;'>proportion des type de location et % </h3>", unsafe_allow_html=True)
 
 pie_1 = go.Figure()
-pie_1.add_trace(go.Pie(
-         values=ratio_checking_type,
-        labels=['Mobile', 'Connect '],
-        marker_colors = ['#202EBD','#13E7E3'],))
+pie_1.add_trace(go.Pie(values=ratio_checking_type,
+                        labels=['Mobile', 'Connect '],
+                        marker_colors = ['#202EBD','#13E7E3'],))
 
 pie_1.update_layout(
                 width=1200,
                 legend=dict(
                 font=dict(
                     size=16
-        )))
+                )))
 
 st.plotly_chart(pie_1)
 
@@ -103,17 +101,16 @@ st.markdown("---")
 st.markdown("<h3 style='text-align: center; color: white;'>proportion des annulation de location</h3>", unsafe_allow_html=True)
 
 pie_2 = go.Figure()
-pie_2.add_trace(go.Pie(
-         values=ratio_state,
-        labels=['Non annulée', 'Annulée'],
-        marker_colors = ['#202EBD','#13E7E3'],))
+pie_2.add_trace(go.Pie(values=ratio_state,
+                        labels=['Non annulée', 'Annulée'],
+                        marker_colors = ['#202EBD','#13E7E3'],))
 
 pie_2.update_layout(
                 width=1200,
                 legend=dict(
                 font=dict(
                     size=16
-        )))
+                )))
 
 st.plotly_chart(pie_2)
 
@@ -124,26 +121,22 @@ pie_3 = make_subplots(rows=1, cols=2, specs=[[{"type": "pie"},{"type": "pie"}]],
                        subplot_titles=["Global", "Mobile", "Connect"])
 
 
-pie_3.add_trace(go.Pie( 
-    values=mobile_ratio_state,
-    labels=['Non annulée', 'Annulée'],
-    marker_colors = ['#20BD2E','#FF3333'],                      
-    ),
-    row=1, col=1)
+pie_3.add_trace(go.Pie( values=mobile_ratio_state,
+                        labels=['Non annulée', 'Annulée'],
+                        marker_colors = ['#20BD2E','#FF3333'],),
+                        row=1, col=1)
 
-pie_3.add_trace(go.Pie(
-    values=connect_ratio_state,
-    labels=['Non annulée', 'Annulée'],
-    marker_colors = ['#20BD2E','#FF3333'],
-    ),
-    row=1, col=2)
+pie_3.add_trace(go.Pie(values=connect_ratio_state,
+                        labels=['Non annulée', 'Annulée'],
+                        marker_colors = ['#20BD2E','#FF3333'],),
+                        row=1, col=2)
 
 pie_3.update_layout(
-    width=1200,
-    legend=dict(
-        font=dict(
-            size=16
-        )))
+                width=1200,
+                legend=dict(
+                font=dict(
+                size=16
+            )))
 
 st.plotly_chart(pie_3)
 
@@ -156,17 +149,17 @@ st.write(f"Le delay moyen d'un retour pour la version connect est de {round(reto
 st.markdown("---")
 
 st.markdown("<h3 style='text-align: center; color: white;'>histogramme sur 24 heures du temps entre les reservations</h3>", unsafe_allow_html=True)
-fig = px.histogram(histo_delta, x="time_delta_with_previous_rental_in_minutes",
-                      color = 'checkin_type',
-                      barmode ='group',
-                      width= 1200,
-                      height = 500
-                      ) 
-fig.update_layout(title_x = 0.5,
-                    legend=dict(
-                        font=dict(
-                    size=16
-                    ))) 
+fig = px.histogram(histo_delta, x="time_delta_with_previous_rental_in_minutes",                   
+                    color = 'checkin_type',
+                    barmode ='group',
+                    width= 1200,
+                    height = 500
+                    ) 
+fig.update_layout(
+                legend=dict(
+                    font=dict(
+                size=16
+                ))) 
                             
 st.plotly_chart(fig)
 
@@ -174,12 +167,12 @@ st.markdown("---")
 
 st.markdown("<h3 style='text-align: center; color: white;'>histogramme sur 24 heures des delais de retour</h3>", unsafe_allow_html=True)
 fig = px.histogram(histo_checkout, x="delay_at_checkout_in_minutes",
-                      color = 'checkin_type',
-                      barmode ='group',
-                      width= 1200,
-                      height = 500
-                      ) 
-fig.update_layout(title_x = 0.5,
+                    color = 'checkin_type',
+                    barmode ='group',
+                    width= 1200,
+                    height = 500
+                    ) 
+fig.update_layout(
                 legend=dict(
                     font=dict(
                 size=16
@@ -198,12 +191,12 @@ st.write(f"Le delay moyen d'un retard pour la version connect est de {round(reta
 
 st.markdown("<h3 style='text-align: center; color: white;'>histogramme sur 24 heures des retards</h3>", unsafe_allow_html=True)
 fig = px.histogram(histo_checkout_reel, x="delay_at_checkout_in_minutes",
-                      color = 'checkin_type',
-                      barmode ='group',
-                      width= 1200,
-                      height = 500
-                      ) 
-fig.update_layout(title_x = 0.5,
+                    color = 'checkin_type',
+                    barmode ='group',
+                    width= 1200,
+                    height = 500
+                    ) 
+fig.update_layout(
                 legend=dict(
                     font=dict(
                 size=16
@@ -215,17 +208,16 @@ st.markdown("---")
 
 st.markdown("<h3 style='text-align: center; color: white;'>proportion des annulation par type de location en tenan compte que des retards</h3>", unsafe_allow_html=True)
 pie_4 = go.Figure()
-pie_4.add_trace(go.Pie(
-         values=perte_global,
-        labels=['location conserver', 'location perdu'],
-        marker_colors = ['#202EBD','#13E7E3'],))
+pie_4.add_trace(go.Pie(values=perte_global,
+                        labels=['location conserver', 'location perdu'],
+                        marker_colors = ['#202EBD','#13E7E3'],))
 
 pie_4.update_layout(
                 width=1200,
                 legend=dict(
                 font=dict(
                     size=16
-        )))
+                )))
 
 st.plotly_chart(pie_4)
 
@@ -239,26 +231,22 @@ pie_5 = make_subplots(rows=1, cols=2, specs=[[{"type": "pie"},{"type": "pie"}]],
                        subplot_titles=["Mobile", "Connect"])
 
 
-pie_5.add_trace(go.Pie( 
-    values=perte_mobile,
-    labels=['location conserver', 'location perdu'],
-    marker_colors = ['#20BD2E','#FF3333'],                      
-    ),
-    row=1, col=1)
+pie_5.add_trace(go.Pie( values=perte_mobile,
+                        labels=['location conserver', 'location perdu'],
+                        marker_colors = ['#20BD2E','#FF3333'],),
+                        row=1, col=1)
 
-pie_5.add_trace(go.Pie(
-    values=perte_connect,
-    labels=['location conserver', 'location perdu'],
-    marker_colors = ['#20BD2E','#FF3333'],
-    ),
-    row=1, col=2)
+pie_5.add_trace(go.Pie(values=perte_connect,
+                        labels=['location conserver', 'location perdu'],
+                        marker_colors = ['#20BD2E','#FF3333'],),
+                        row=1, col=2)
 
 pie_5.update_layout(
-    width=1200,
-    legend=dict(
-        font=dict(
-            size=16
-        )))
+                width=1200,
+                legend=dict(
+                 font=dict(
+                    size=16
+                )))
 
 st.plotly_chart(pie_5)
 

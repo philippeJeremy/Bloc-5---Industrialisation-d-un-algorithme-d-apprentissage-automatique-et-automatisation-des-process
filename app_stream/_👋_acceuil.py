@@ -6,8 +6,6 @@ import plotly.graph_objects as go
 
 from PIL import Image
 
-
-
 DATA = "get_around_delay_analysis.xlsx"
 
 st.set_page_config(
@@ -18,7 +16,7 @@ st.set_page_config(
 
 image = Image.open("istockphoto-1448987777-1024x1024.jpg")
 
-st.markdown("<h1 style='text-align: center; color: white;'>Bienvenue sur la page d'acceuil du rapport GetAround</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: white;'>Welcome to the GetAround report home page</h1>", unsafe_allow_html=True)
 st.markdown("")
 st.markdown("")
 

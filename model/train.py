@@ -63,7 +63,6 @@ if __name__ == "__main__":
                             ("Regressor", LinearRegression())
                             ]) 
        
-
     with mlflow.start_run(experiment_id = experiment.experiment_id):
 
         model.fit(x_train, y_train)
