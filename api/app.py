@@ -1,6 +1,6 @@
-import mlflow 
+import mlflow
 import uvicorn
-import pandas as pd 
+import pandas as pd
 from pydantic import BaseModel
 from typing import Literal, List, Union
 from fastapi import FastAPI, File, UploadFile
@@ -35,6 +35,8 @@ app = FastAPI(
     },
     openapi_tags=tags_metadata
 )
+
+
 class PredictionFeatures(BaseModel):
     model_key: str = "Citroën"
     mileage: int = 140411
@@ -50,6 +52,7 @@ class PredictionFeatures(BaseModel):
     has_speed_regulator: bool = True
     winter_tires: bool = True
 
+
 @app.get("/", tags=["Introduction Endpoints"])
 async def index():
     """
@@ -58,24 +61,23 @@ async def index():
     message = "Bonjour! Ce `/` est le point de terminaison le plus simple et par défaut. Si vous voulez en savoir plus, consultez la documentation de l'API sur `/docs`"
     return message
 
+
 @app.post("/predict", tags=["Machine Learning"])
 async def predict(predictionFeatures: PredictionFeatures):
     """
     Prediction du prix à la journée. 
     """
-   
+
     price_day = pd.DataFrame(dict(predictionFeatures), index=[0])
-                            
+
     logged_model = 'runs:/1a51baa33dda46a58f334fd81ecb8113/price_car'
 
     loaded_model = mlflow.pyfunc.load_model(logged_model)
-
-    # loaded_model = joblib.load('model.joblib')
 
     prediction = loaded_model.predict(price_day)
 
     response = prediction.tolist()[0]
     return response
 
-if __name__=="__main__":
+if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=4000)
