@@ -1,7 +1,5 @@
 # Bloc-5-Industrialisation-d-un-algorithme-d-apprentissage-automatique-et-automatisation-des-process
 
-video: https://share.vidyard.com/watch/ZNXmweK9PsaYDwdRsqyyhD?
-
 certification: https://www.francecompetences.fr/recherche/rncp/35288/
 
 Cancellation analysis and creation of a prediction API.
